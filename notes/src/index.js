@@ -1,10 +1,10 @@
 import React from 'react';
-// react 模板, react-dom
+// react 模板，react-dom  完成组件的基本渲染
 import ReactDOM from 'react-dom';
-import './index.css'; //一切皆可打包
+import './index.css';
 import App from './App';
-// import registerServiceWorker from './registerServiceWorker'; //接收浏览器端
+// import registerServiceWorker from './registerServiceWorker';
 
-// ReactDOM 渲染组件
-ReactDOM.render(<App />, document.getElementById('root')); //做组件式开发
+// 将组件挂载到根节点上
+ReactDOM.render(<App />, document.getElementById('root'));
 // registerServiceWorker();
