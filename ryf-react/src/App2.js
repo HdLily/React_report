@@ -18,7 +18,7 @@ class App extends Component {
                 <HelloMessage name="John" />
                 <ul>
                     {
-
+                        arr
                     }
                 </ul>
             </div>

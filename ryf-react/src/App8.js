@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import './App.css';
 
 class Hello extends Component {
-    state = {
+    state = {  
         opacity: 1.0
     }
     componentDidMount () {
