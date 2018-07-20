@@ -4,7 +4,7 @@ const Sequelize = require('sequelize');
 const sequelize = new Sequelize('antd', 'root', '1234567', {
     host: 'localhost',
     dialect: 'mysql',
-    operatorsAliases: true,
+    operatorsAliases: true, //该值一定要写true,否则后续使用sql会出问题,例如使用￥like模糊查询会出现invalid value问题
     pool: {
         max: 5,
         min: 0,

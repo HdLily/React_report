@@ -30,9 +30,14 @@ class App extends Component {
                 </div>
             )
         }
-    }]
+    }];
     state = {
         visible: false,
+        dataSource: [],
+        current: 1,
+        size: 10,
+        total: 0,
+        search: '',
         users: [{
             username: 'zk',
             age: 18,
@@ -49,6 +54,26 @@ class App extends Component {
         editRow: {}
     }
 
+    ComponentDidMount () {
+        this.sizeChange(this.state.current, this.state.size);
+    }
+
+    //分页
+    sizeChange = (current, size) => {
+        let data = {
+            search: 'slf',
+            limit: size,
+            offset: (parseInt(current) - 1) * size
+        }
+        axios.post('http://localhost:3006/user-search', data).then(data => {
+            this.setState({
+                dataSource: data.data.rows,
+                total: data.data.count,
+                current,size
+            })
+        })
+    };
+
     remove(row) {
         const that = this;
         confirm({
@@ -56,6 +81,11 @@ class App extends Component {
             okText: 'yes',
             cancelText: 'no',
             onOk() {
+                axios.delete('http://127.0.0.1:3006/user/' +row.id)
+                    .then(data => {
+                        that.sizeChange(that.state.current, that.state.size);
+                        message.success('success!')
+                    })
                 const _users = that.state.users.filter(data => {
                     return data.id != row.id
                 });
@@ -64,33 +94,50 @@ class App extends Component {
                 })
             }
         })
-    }
+    };
+    search = (name) => {
+        this.setState ({
+            search: name
+        },() => {
+            this.sizeChange(1,10)
+        })
+    };
     handleOk() {
         // console.log('ok')
         // this.setState({
         //     visible: false
         // })
         this.props.form.validateFieldsAndScroll((err, values) => {
-            const { username, age, address } = values
-            const _id = this.state++
+            // const { username, age, address } = values
+            // const _id = this.state++
 
-            if (!err) {
-              
+            if (err) return;
                 let data = {
                     username: values.username,
                     age: values.age,
                     address: values.address
+                };
+                if(this.state.modalType === 'add') {
+                    axios.post('http://127.0.0.1:3006/user', data)
+                        .then(msg => {
+                            this.sizeChange(this.state.current, this.state.size);
+                            console.log(msg);
+                            this.setState({visible: false,});
+                            message.success('添加成功');
+                        })   
+                } 
+                else {
+                    axios.put('http://127.0.0.1:3006/user/' + this.state.editRow.id, data)
+                        .then(data => {
+                            this.sizeChange(this.state.current, this.state.size);
+                            console.log(data);
+                            this.setState({
+                                visible: false
+                            });
+                            message.success('success!')
+                        })
                 }
-                console.log(data)
-                axios.post('http://127.0.0.1:3006/user',data)
-                    .then(msg => {
-                        console.log(msg);
-                        this.setState({
-                            visible: false,
-                        });
-                        message.success('添加成功');
-                    })
-            }
+                  
         })      
     }
     searchUser (event) {
@@ -115,13 +162,20 @@ class App extends Component {
         return (
             <div className="App">
                 <Row>
-                    <Search style={{ width: 300 }} onChange={this.searchUser.bind(this)}/>
+                    {/* {this.searchUser.bind(this)} */}
+                    <Search style={{ width: 300 }} onChange={this.searchUser} />
                     <Button type="primary" style={{ marginLeft: 20, marginTop: 20 }} onClick={() => this.modal('add')} >添加用户</Button>
                 </Row>
                 <Row style={{ paddingTop: 20 }}>
                     {/* columns 简单的配置, 一个配置项 */}
                     <Table dataSource={this.state.users} columns={this.columns} rowKey={row => row.id} bordered pagination={false} />
+                </Row>
 
+                <Row style={{paddingTop: 20}}>
+                    <Pagination 
+                        showTotal={(total => `共${total}条`)}
+                        current={this.state.current} total={this.state.total} pageSize={this.state.size}
+                        onChange={this.sizeChange} />
                 </Row>
 
                 <Modal title={this.state.modalType === 'add' ? "添加用户" : '编辑用户'} visible={this.state.visible}
@@ -131,7 +185,7 @@ class App extends Component {
                         <FormItem label="用户" {...formItemLayout}>
                             {
                                 getFieldDecorator('username', {
-                                    rules: [{ required: true, message: 'Please input your username!' }]
+                                    rules: [{ required: true, message: 'Please input your username!' }],
                                 })(<Input placeholder="UserName" />)
                             }
 
@@ -161,10 +215,11 @@ class App extends Component {
             </div>
         );
     }
-    modal(type, row) {
+    modal(type, row) { // 添加编辑用户
         // console.log(type);
         this.setState({
-            visible: true
+            visible: true,
+            modalType: type
         }, () => {
             this.props.form.resetFields();
             if (type === 'add') return;
@@ -173,6 +228,7 @@ class App extends Component {
                 age: row.age,
                 address: row.address
             })
+            this.setState({editRow: row})
         })
     }
 }
