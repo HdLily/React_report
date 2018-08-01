@@ -1,11 +1,15 @@
 import React, { Component } from 'react';
 import { BrowserRouter as Router, Route, Switch, Redirect, NavLink} from 'react-router-dom';
-import '@/stylus/reset.styl';
+import '@/assets/stylus/reset.styl';
+import '@/assets/stylus/font.styl';
 import logo from '@/assets/imgs/logo.png';
 import '@/components/App.styl';
+
 import Recommend from './recommend/Recommend';
 import Ranking from './ranking/Ranking';
 import Search from './search/Search';
+
+import MusicPlayer from './play/MusicPlayer';
 class App extends Component {
   render() {
     return (
@@ -41,6 +45,7 @@ class App extends Component {
               <Route  component={Recommend} />
             </Switch>
           </div>
+          <MusicPlayer />
         </div>
       </Router>
     )
