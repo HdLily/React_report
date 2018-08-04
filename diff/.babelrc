@@ -1,0 +1,11 @@
+{
+    "presets": ["env"],
+    "plugins": [
+        [
+            "transform-react-jsx", //转换方法
+            {
+                "pragma": "React.createElement"
+            }
+        ]
+    ]
+}
